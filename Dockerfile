@@ -1,3 +1,13 @@
+# Build biliup's web-ui
+FROM node:lts as webui
+ARG repo_url=https://github.com/biliup/biliup
+ARG branch_name=master
+RUN set -eux \
+    && git clone --depth 1 --branch "$branch_name" "$repo_url" \
+    && cd biliup \
+    && npm install \
+    && npm run build
+
 # Deploy Biliup
 FROM python:3.12-slim as biliup
 ARG repo_url=https://github.com/biliup/biliup
