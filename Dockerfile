@@ -16,9 +16,9 @@ ENV TZ=Asia/Shanghai
 EXPOSE 19159/tcp
 VOLUME /opt
 
+# 安装必要的依赖包
 RUN set -eux \
     && savedAptMark="$(apt-mark showmanual)" \
-    && useApt=false \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
         wget \
@@ -26,7 +26,7 @@ RUN set -eux \
         net-tools \  # net-tools 包包含 ifconfig 和其他网络命令
         dnsutils \  # dnsutils 包包含 nslookup
         xz-utils \
-        procps  # 安装 top 和 free 命令 \
+        procps \  # 安装 top 和 free 命令 \
     && apt-mark auto '.*' > /dev/null \
     && arch="$(dpkg --print-architecture)" && arch="${arch##*-}" \
     && url='https://github.com/yt-dlp/FFmpeg-Builds/releases/download/autobuild-2023-10-31-14-21/' \
@@ -63,6 +63,7 @@ RUN set -eux \
         /var/tmp/* \
         /var/log/*
 
+# 安装其他必要的工具
 RUN set -eux \
     && savedAptMark="$(apt-mark showmanual)" \
     && apt-get update \
@@ -82,16 +83,15 @@ RUN set -eux \
         /var/tmp/* \
         /var/log/*
 
-# Copy all files into the container
+# 将文件拷贝到容器中
 COPY . /opt
 
-# Set execute permissions for the files
+# 设置文件执行权限
 RUN chmod +x /opt/upload /opt/down
 
-# Copy the built web-ui files from the previous stage
+# 拷贝构建后的 web-ui 文件
 COPY --from=webui /biliup/biliup/web/public/ /biliup/biliup/web/public/
 
 WORKDIR /opt
-
 
 #ENTRYPOINT ["biliup"]
