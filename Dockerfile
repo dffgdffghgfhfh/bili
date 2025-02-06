@@ -23,8 +23,7 @@ RUN set -eux \
     && apt-get install -y --no-install-recommends \
         wget \
         curl \
-        net-tools \  # net-tools 包包含 ifconfig 和其他网络命令
-        dnsutils \  # dnsutils 包包含 nslookup
+        net-tools \  # net-tools 包包含 ifconfig 和其他网络命令 \
         xz-utils \
         procps \  # 安装 top 和 free 命令 \
     && apt-mark auto '.*' > /dev/null \
@@ -93,5 +92,6 @@ RUN chmod +x /opt/upload /opt/down
 COPY --from=webui /biliup/biliup/web/public/ /biliup/biliup/web/public/
 
 WORKDIR /opt
+
 
 #ENTRYPOINT ["biliup"]
