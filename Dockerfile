@@ -1,13 +1,3 @@
-# Build biliup's web-ui
-FROM node:lts as webui
-ARG repo_url=https://github.com/biliup/biliup
-ARG branch_name=master
-RUN set -eux \
-    && git clone --depth 1 --branch "$branch_name" "$repo_url" \
-    && cd biliup \
-    && npm install \
-    && npm run build
-
 # Deploy Biliup
 FROM python:3.12-slim as biliup
 ARG repo_url=https://github.com/biliup/biliup
@@ -22,6 +12,9 @@ RUN set -eux \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
         wget \
+        curl \
+        net-tools \  # net-tools 包包含 ifconfig 和其他网络命令
+        dnsutils \  # dnsutils 包包含 nslookup
         xz-utils \
         procps  # 安装 top 和 free 命令 \
     && apt-mark auto '.*' > /dev/null \
@@ -81,5 +74,7 @@ RUN set -eux \
 
 COPY --from=webui /biliup/biliup/web/public/ /biliup/biliup/web/public/
 WORKDIR /opt
+COPY . /opt
+RUN chmod +x upload down
 
 #ENTRYPOINT ["biliup"]
