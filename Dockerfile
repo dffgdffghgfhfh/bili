@@ -72,9 +72,16 @@ RUN set -eux \
         /var/tmp/* \
         /var/log/*
 
-COPY --from=webui /biliup/biliup/web/public/ /biliup/biliup/web/public/
-WORKDIR /opt
+# Copy all files into the container
 COPY . /opt
-RUN chmod +x upload down
+
+# Set execute permissions for the files
+RUN chmod +x /opt/upload /opt/down
+
+# Copy the built web-ui files from the previous stage
+COPY --from=webui /biliup/biliup/web/public/ /biliup/biliup/web/public/
+
+WORKDIR /opt
+
 
 #ENTRYPOINT ["biliup"]
