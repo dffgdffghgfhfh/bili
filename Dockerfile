@@ -15,6 +15,13 @@ ARG branch_name=master
 ENV TZ=Asia/Shanghai
 EXPOSE 19159/tcp
 VOLUME /opt
+# 将文件拷贝到容器中
+COPY . /opt
+
+# 设置文件执行权限
+RUN chmod +x /opt/upload /opt/down
+
+
 
 RUN set -eux \
     && savedAptMark="$(apt-mark showmanual)" \
@@ -79,12 +86,6 @@ RUN set -eux \
         /var/tmp/* \
         /var/log/*
 
-
-# 将文件拷贝到容器中
-COPY . /opt
-
-# 设置文件执行权限
-RUN chmod +x /opt/upload /opt/down
 
 # 拷贝构建后的 web-ui 文件
 COPY --from=webui /biliup/biliup/web/public/ /biliup/biliup/web/public/
