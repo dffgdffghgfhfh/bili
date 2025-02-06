@@ -16,7 +16,7 @@ ENV TZ=Asia/Shanghai
 EXPOSE 19159/tcp
 VOLUME /opt
 
-# 安装必要的依赖包
+# 确保 apt-get 更新源并安装必要的依赖包
 RUN set -eux \
     && savedAptMark="$(apt-mark showmanual)" \
     && apt-get update \
