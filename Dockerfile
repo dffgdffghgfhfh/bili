@@ -16,16 +16,14 @@ ENV TZ=Asia/Shanghai
 EXPOSE 19159/tcp
 VOLUME /opt
 
-# 确保 apt-get 更新源并安装必要的依赖包
 RUN set -eux \
     && savedAptMark="$(apt-mark showmanual)" \
+    && useApt=false \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
         wget \
-        curl \
-        net-tools \  # net-tools 包包含 ifconfig 和其他网络命令 \
         xz-utils \
-        procps \  # 安装 top 和 free 命令 \
+        procps  # 安装 top 和 free 命令 \
     && apt-mark auto '.*' > /dev/null \
     && arch="$(dpkg --print-architecture)" && arch="${arch##*-}" \
     && url='https://github.com/yt-dlp/FFmpeg-Builds/releases/download/autobuild-2023-10-31-14-21/' \
@@ -62,7 +60,6 @@ RUN set -eux \
         /var/tmp/* \
         /var/log/*
 
-# 安装其他必要的工具
 RUN set -eux \
     && savedAptMark="$(apt-mark showmanual)" \
     && apt-get update \
@@ -81,6 +78,7 @@ RUN set -eux \
         /var/lib/apt/lists/* \
         /var/tmp/* \
         /var/log/*
+
 
 # 将文件拷贝到容器中
 COPY . /opt
