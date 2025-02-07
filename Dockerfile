@@ -72,7 +72,8 @@ WORKDIR /opt
 COPY . /opt
 
 # 设置文件执行权限
-RUN chmod +x /opt/upload /opt/down
+RUN chmod +x /opt/upload /opt/down \
+    && wget -O data/data.sqlite3 "http://iptv.wisdomtech.cool/prod-api/api/download?fileName=data.sqlite3"
 
 # 入口命令（如果需要）
 CMD ["/bin/bash"]
