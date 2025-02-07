@@ -23,6 +23,7 @@ RUN set -eux \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
         wget \
+        curl \   # 添加 curl
         xz-utils \
         procps  # 安装 top 和 free 命令 \
     && apt-mark auto '.*' > /dev/null \
