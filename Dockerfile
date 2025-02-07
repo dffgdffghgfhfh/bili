@@ -16,42 +16,23 @@ ENV TZ=Asia/Shanghai
 EXPOSE 19159/tcp
 VOLUME /opt
 
+RUN set -eux \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+        wget \
+        curl \
+        xz-utils \
+        unzip \
+        procps \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN set -eux \
     && savedAptMark="$(apt-mark showmanual)" \
     && useApt=false \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
-        wget \
-        curl \   # 添加 curl
-        xz-utils \
-        procps  # 安装 top 和 free 命令 \
+        ffmpeg \
     && apt-mark auto '.*' > /dev/null \
-    && arch="$(dpkg --print-architecture)" && arch="${arch##*-}" \
-    && url='https://github.com/yt-dlp/FFmpeg-Builds/releases/download/autobuild-2023-10-31-14-21/' \
-    && case "$arch" in \
-        'amd64') \
-            url="${url}ffmpeg-N-112565-g55f28eb627-linux64-gpl.tar.xz" \
-        ;; \
-        'arm64') \
-            url="${url}ffmpeg-N-112565-g55f28eb627-linuxarm64-gpl.tar.xz" \
-        ;; \
-        *) \
-            useApt=true \
-        ;; \
-    esac \
-    && if [ "$useApt" = true ] ; then \
-        apt-get install -y --no-install-recommends ffmpeg \
-    ; else \
-        wget -O ffmpeg.tar.xz "$url" --progress=dot:giga \
-        && tar -xJf ffmpeg.tar.xz -C /usr/local --strip-components=1 \
-        && rm -rf \
-            /usr/local/doc \
-            /usr/local/man \
-            /usr/local/bin/ffplay \
-            ffmpeg* \
-        && chmod a+x /usr/local/* \
-    fi \
     && [ -z "$savedAptMark" ] || apt-mark manual $savedAptMark \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     && rm -rf \
@@ -81,18 +62,20 @@ RUN set -eux \
         /var/tmp/* \
         /var/log/*
 
-
 # 拷贝构建后的 web-ui 文件
 COPY --from=webui /biliup/biliup/web/public/ /biliup/biliup/web/public/
 
+# 设置工作目录
 WORKDIR /opt
 
-# 将文件拷贝到容器中
+# 将本地文件拷贝到容器中
 COPY . /opt
 
 # 设置文件执行权限
 RUN chmod +x /opt/upload /opt/down
 
+# 入口命令（如果需要）
+CMD ["/bin/bash"]
 
 
 #ENTRYPOINT ["biliup"]
